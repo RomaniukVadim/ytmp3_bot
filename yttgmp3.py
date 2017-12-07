@@ -6,7 +6,6 @@ import telegram
 from time import sleep
 token = "token"
 bot = telegram.Bot(token=token)
-
 # Боту шлется ссылка на ютуб, он загоняет ее в bash комманду youtube-dl -x --audio-format mp3 <link>, шлет загруженный mp3 обратно клиенту
 
 
@@ -62,7 +61,6 @@ mp3_bot = BotHandler(token)
 
 def main():  
     new_offset = None
-
     while True:
         mp3_bot.get_updates(new_offset)
 
@@ -76,12 +74,14 @@ def main():
             last_chat_text = 'null'
             last_chat_id = 0
         print(last_chat_text)
-        if 'https://www.youtube.com/' in last_chat_text.lower() or 'https://youtu.be/' in last_chat_text.lower():
-            
+        if 'https://www.youtube.com/' in last_chat_text.lower() or 'https://youtu.be/' in last_chat_text.lower():            
+            bot.send_message(chat_id=last_chat_id, text="Downloading, please wait....")
             song_name = mp3_download(last_chat_text)
+            bot.send_message(chat_id=last_chat_id, text="Uploading, please wait....")
             bot.send_audio(chat_id=last_chat_id, audio=open(song_name, 'rb'))
             song_rm()
-
+        elif '/start' in last_chat_text.lower():
+            bot.send_message(chat_id=last_chat_id, text="Please send me youtube link.")
         new_offset = last_update_id + 1
 
 if __name__ == '__main__':  
